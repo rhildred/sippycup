@@ -2,7 +2,7 @@
 let pyodide;
 let app, requestStatus, headers;
 
-if ('function' === typeof (importScripts)) {
+if ('function' === typeof(importScripts)) {
     // eslint-disable-next-line no-undef
     importScripts("https://cdn.jsdelivr.net/pyodide//v0.21.3/full/pyodide.js");
 }
@@ -17,7 +17,7 @@ with open("templates/style.css", "r") as file:
     return css.join('')
 }
 
-function handleRequest(requestMethod = "GET", route = "/", target = self) {
+function handleRequest(requestMethod="GET", route="/", target=self) {
     const environ = {
         'wsgi.url_scheme': 'http',
         'REQUEST_METHOD': requestMethod,
@@ -27,7 +27,7 @@ function handleRequest(requestMethod = "GET", route = "/", target = self) {
     let response = r.__next__()
     console.log('response before converting to string', response)
     response = response.toString()
-    response = response.slice(2, response.length - 1)
+    response = response.slice(2, response.length-1)
     response = response.replace(`<link rel="stylesheet" href="style.css">`, `<style>${getCss()}</style>`)
     const textEncoder = new TextEncoder();
     console.log(response)
@@ -39,7 +39,7 @@ function handleRequest(requestMethod = "GET", route = "/", target = self) {
             headers: headers,
             status: requestStatus
         },
-        stdout: `127.0.0.1 - - [${logDate()}] "${requestMethod} ${route} HTTP/1.1" ${requestStatus} -\n`
+        stdout:  `127.0.0.1 - - [${logDate()}] "${requestMethod} ${route} HTTP/1.1" ${requestStatus} -\n`
     }
 }
 
@@ -66,10 +66,10 @@ async function main(src) {
 
     app = pyodide.globals.get("app").toJs();
 
-    self.postMessage({ 'command': 'appReady' })
+    self.postMessage({'command':'appReady'})
 }
 
-function start_response(status, responseHeaders, exc_info) {
+function start_response(status, responseHeaders, exc_info) {   
     requestStatus = status
     let headersObject = {}
     responseHeaders.toJs().forEach(([key, value]) => headersObject[key] = value)
@@ -82,37 +82,32 @@ export async function request(method, route) {
 
 export async function run(src) {
     await main(src)
-    let stdout = `\n * Serving Flask app 'app'\n * Running on http://127.0.0.1:5000\n`
-    return stdout
+        let stdout = `\n * Serving Flask app 'app'\n * Running on http://127.0.0.1:5000\n`
+        return stdout
 }
 
 export async function start() {
     let output
     // eslint-disable-next-line no-undef
-    pyodide = await loadPyodide({
-        stdout: (_output) => {
-            output = _output
-        }
-    });
+    pyodide = await loadPyodide({ stdout: (_output) => {
+        output = _output
+    }});
 
     pyodide.runPython(
-        `import os
+`import os
 
 os.mkdir('templates')
 `);
-
-    await pyodide.loadPackage('micropip');
-    setTimeout(async ()=>{
-        const micropip = await pyodide.pyimport("micropip");
-        await micropip.install('flask');    
-    },1);
-    
+        
+    await pyodide.loadPackage("micropip")
+        .then(() => pyodide.pyimport("micropip"))
+        .then(micropip => micropip.install('flask'));
 
     return output
 }
 
 export async function updateFile(filename, content) {
-    const src = `
+    const src=`
 with open("templates/${filename}", "w") as file:
     file.write("""${content}""")
 `
