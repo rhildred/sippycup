@@ -106,7 +106,7 @@ os.mkdir('templates')
         const micropip = await pyodide.pyimport("micropip");
         await micropip.install('flask');    
         NativeFs.syncfs();
-    }, 1);
+    }, 10);
     return output;
 }
 

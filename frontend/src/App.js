@@ -96,6 +96,7 @@ function App(props) {
         setServerRunning(true)
       })
     })();
+// eslint-disable-next-line
   }, [sippycup])
 
   async function save() {

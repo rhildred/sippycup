@@ -29,7 +29,7 @@ export default function AboutModal() {
 
     return (
         <div>
-            <IconButton sx={{marginTop: "auto"}} color="primary" onClick={ handleClickOpen }><img src="logo.svg" height="40"></img></IconButton>
+            <IconButton sx={{marginTop: "auto"}} color="primary" onClick={ handleClickOpen }><img src="logo.svg" height="40" alt="logo"></img></IconButton>
             <Dialog
                 open={open}
                 onClose={handleClose}
