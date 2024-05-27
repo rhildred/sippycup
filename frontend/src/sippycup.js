@@ -88,7 +88,7 @@ export async function run(src) {
 
 let NativeFs;
 export async function start() {
-    let output
+    let output;
     // eslint-disable-next-line no-undef
     pyodide = await loadPyodide({ stdout: (_output) => {
         output = _output
@@ -107,7 +107,7 @@ os.mkdir('templates')
         await micropip.install('flask');    
         NativeFs.syncfs();
     }, 1);
-    return output
+    return output;
 }
 
 export async function updateFile(filename, content) {
