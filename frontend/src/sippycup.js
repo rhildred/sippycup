@@ -4,7 +4,7 @@ let app, requestStatus, headers;
 
 if ('function' === typeof(importScripts)) {
     // eslint-disable-next-line no-undef
-    importScripts("https://cdn.jsdelivr.net/pyodide//v0.21.3/full/pyodide.js");
+    importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js");
 }
 
 function getCss() {
@@ -86,6 +86,7 @@ export async function run(src) {
         return stdout
 }
 
+let NativeFs;
 export async function start() {
     let output
     // eslint-disable-next-line no-undef
@@ -93,16 +94,19 @@ export async function start() {
         output = _output
     }});
 
-    pyodide.runPython(
+     pyodide.runPython(
 `import os
-
 os.mkdir('templates')
 `);
-        
-    await pyodide.loadPackage("micropip")
-        .then(() => pyodide.pyimport("micropip"))
-        .then(micropip => micropip.install('flask'));
+    const dir = await navigator.storage.getDirectory();
+    NativeFs = await pyodide.mountNativeFS("", dir);
 
+    await pyodide.loadPackage("micropip");
+    setTimeout(async()=>{
+        const micropip = await pyodide.pyimport("micropip");
+        await micropip.install('flask');    
+        NativeFs.syncfs();
+    }, 1);
     return output
 }
 
@@ -111,7 +115,8 @@ export async function updateFile(filename, content) {
 with open("templates/${filename}", "w") as file:
     file.write("""${content}""")
 `
-    pyodide.runPython(src)
+    await pyodide.runPython(src);
+    NativeFs.syncfs();
 }
 
 
